@@ -1,10 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def logistic(l, x): 
-    return 4 * l* x * (1 -x)
+from utils import logistic
 
-def logistic_con(c, x): 
+
+def logistic_con(c, x):
     return np.exp(c * x) / (1 + np.exp(c * x))
 
 
@@ -16,9 +16,10 @@ def cal_y(l, x_0, n):
         x_0 = x_1
     return y
 
+
 # calculate the discrete logistic map
 y = []
-y_0 =  0.0003
+y_0 = 0.0003
 for i in range(20):
     y_1 = logistic(0.5, y_0)
     y.append(y_1)
@@ -26,8 +27,8 @@ for i in range(20):
 
 
 # create two subplots
-fig, ax = plt.subplots(1,2, figsize=(14, 7))
-# set common label 
+fig, ax = plt.subplots(1, 2, figsize=(14, 7))
+# set common label
 frame = fig.add_subplot(111, frameon=False)
 frame.set_xticks([])
 frame.set_yticks([])
@@ -35,7 +36,7 @@ frame.set_ylabel('Population', fontsize=20, labelpad=40)
 
 
 # mark each data point with a red circle and connecting with blue line
-# remove x, y labels 
+# remove x, y labels
 ax[0].plot(y, '-bo', markersize=10)
 ax[0].set_xticks([])
 ax[0].set_yticks([])
@@ -56,4 +57,3 @@ plt.tight_layout()
 # plt.show()
 
 plt.savefig('logistic_map.png')
-
