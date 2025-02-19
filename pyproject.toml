@@ -1,7 +1,7 @@
 [project]
 name = "graph-qc"
 version = "0.1.0"
-description = "Add your description here"
+description = "Codes that produce figures for Quantifying Chaos report, final year mathematic group project at the University of Edinburgh."
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [

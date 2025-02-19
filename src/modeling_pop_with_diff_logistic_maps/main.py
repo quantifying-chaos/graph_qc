@@ -1,5 +1,6 @@
-import numpy as np 
-import matplotlib.pyplot as plt 
+import numpy as np
+import matplotlib.pyplot as plt
+
 
 def logistic_map(l, x):
     return 4 * l * x * (1 - x)
@@ -9,7 +10,7 @@ def iterate_logistic_map(l, x, n):
     ret = []
     ret.append(x)
     for i in range(n):
-        x = logistic_map(l, x) 
+        x = logistic_map(l, x)
         ret.append(x)
     return ret
 
@@ -20,17 +21,21 @@ lambda_vals = [0.1, 0.25, 0.6, 0.8, 0.9, 1]
 fig, ax = plt.subplots(row, col, figsize=(12, 14))
 
 for i in range(row):
-    t_row = i 
+    t_row = i
     for j in range(col):
         t_col = j
         lambda_v = lambda_vals[t_row * col + t_col]
         ax[t_row][t_col].set_title(f"$\lambda$ = {lambda_v}", fontsize=30)
-        ax[t_row][t_col].plot(iterate_logistic_map(lambda_v, 0.1, 30),'-o', label="$x_0$ = 0.1")
-        ax[t_row][t_col].plot(iterate_logistic_map(lambda_v, 0.3, 30), '-o', label="$x_0$ = 0.2")
-        ax[t_row][t_col].plot(iterate_logistic_map(lambda_v, 0.7, 30), '-o', label="$x_0$ = 0.7")
-        ax[t_row][t_col].plot(iterate_logistic_map(lambda_v, 0.87, 30), '-o', label="$x_0$ = 0.9")
+        ax[t_row][t_col].plot(iterate_logistic_map(
+            lambda_v, 0.1, 30), '-o', label="$x_0$ = 0.1")
+        ax[t_row][t_col].plot(iterate_logistic_map(
+            lambda_v, 0.3, 30), '-o', label="$x_0$ = 0.2")
+        ax[t_row][t_col].plot(iterate_logistic_map(
+            lambda_v, 0.7, 30), '-o', label="$x_0$ = 0.7")
+        ax[t_row][t_col].plot(iterate_logistic_map(
+            lambda_v, 0.87, 30), '-o', label="$x_0$ = 0.9")
         ax[t_row][t_col].legend(fontsize=24)
-        # set ticks size 
+        # set ticks size
         ax[t_row][t_col].tick_params(axis='both', labelsize=14)
 
 frame = fig.add_subplot(111, frameon=False)
