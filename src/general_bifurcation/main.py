@@ -1,17 +1,14 @@
 import sys
 import numpy as np
-import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
 
 from utils import iterate_and_record_all_x_0, get_stage, timeit
 
-matplotlib.use("GTKAgg")
-
 
 @timeit
 def cal_bifurcation_data(
-    func,
+    func=None,
     r_low=0,
     r_high=0,
     n_of_r=400,
@@ -23,12 +20,34 @@ def cal_bifurcation_data(
     repetitions=5,
     save_to_file=None,
     finer_tune=False,
-    stage_steps=[0.3, 0.4],
-    prep_times_list=[100, 200, 300],
-    plot_times_list=[100, 200, 250],
-    repetitions_list=[5, 10, 10],
+    stage_steps=None,
+    prep_times_list=None,
+    plot_times_list=None,
+    repetitions_list=None,
+    config=None,
 ):
+    if config is not None:
+        func = config.get("func")
+        r_low = config.get("r_low")
+        r_high = config.get("r_high")
+        n_of_r = config.get("n_of_r")
+        prep_times = config.get("prep_times")
+        plot_times = config.get("plot_times")
+        random_x_0 = config.get("random_x_0")
+        x_low_bound = config.get("x_low_bound")
+        x_high_bound = config.get("x_high_bound")
+        repetitions = config.get("repetitions")
+        save_to_file = config.get("file_name") + ".pkl"
+        finer_tune = config.get("finer_tune")
+        stage_steps = config.get("stage_steps")
+        prep_times_list = config.get("prep_times_list")
+        plot_times_list = config.get("plot_times_list")
+        repetitions_list = config.get("repetitions_list")
+
     if finer_tune:
+        if stage_steps is None:
+            print("stage_steps must be provided in finer_tune mode")
+            sys.exit(1)
         assert len(stage_steps) + 1 == len(prep_times_list)
         assert len(stage_steps) + 1 == len(plot_times_list)
         assert len(stage_steps) + 1 == len(repetitions_list)
@@ -86,7 +105,6 @@ def graph_bifurcation(
     n_of_r=400,
     prep_times=100,
     plot_times=100,
-    plot_name="bifurcation.png",
     graph_line=None,
     line_attr=None,  # dictionary
     random_x_0=True,
@@ -96,12 +114,14 @@ def graph_bifurcation(
     alpha=0.5,
     dot_size=0.3,
     finer_tune=False,
-    stage_steps=[0.3, 0.4],
-    alpha_list=[0.5, 0.3, 0.2],
-    prep_times_list=[100, 200, 300],
-    plot_times_list=[100, 200, 250],
-    repetitions_list=[5, 10, 10],
-    dot_size_list=[0.2, 0.1, 0.1],
+    stage_steps=None,
+    alpha_list=None,
+    prep_times_list=None,
+    plot_times_list=None,
+    repetitions_list=None,
+    dot_size_list=None,
+    no_vertical_label=False,
+    config=None,  # a dictionary overwrites all the above parameters
 ):
     """
     Produce the graph of bifurcation for a given function in the open interval.
@@ -134,6 +154,32 @@ def graph_bifurcation(
 
 
     """
+
+    if config is not None:
+        func = config.get("func")
+        r_low = config.get("r_low")
+        r_high = config.get("r_high")
+        n_of_r = config.get("n_of_r")
+        prep_times = config.get("prep_times")
+        plot_times = config.get("plot_times")
+        random_x_0 = config.get("random_x_0")
+        x_low_bound = config.get("x_low_bound")
+        x_high_bound = config.get("x_high_bound")
+        repetitions = config.get("repetitions")
+        read_from_file = config.get("file_name") + ".pkl"
+        alpha = config.get("alpha")
+        dot_size = config.get("dot_size")
+        finer_tune = config.get("finer_tune")
+        stage_steps = config.get("stage_steps")
+        alpha_list = config.get("alpha_list")
+        prep_times_list = config.get("prep_times_list")
+        plot_times_list = config.get("plot_times_list")
+        repetitions_list = config.get("repetitions_list")
+        dot_size_list = config.get("dot_size_list")
+        graph_line = config.get("graph_line")
+        line_attr = config.get("line_attr")
+        no_vertical_label = config.get("no_vertical_label")
+
     if func is None and read_from_file is None:
         print(
             "Either func or read_from_file must be provided in function graph_bifurcation"
@@ -143,15 +189,18 @@ def graph_bifurcation(
     # Error checking
     if finer_tune:
         assert len(stage_steps) + 1 == len(alpha_list)
-        assert len(stage_steps) + 1 == len(prep_times_list)
-        assert len(stage_steps) + 1 == len(plot_times_list)
-        assert len(stage_steps) + 1 == len(repetitions_list)
+        if prep_times_list is not None:
+            assert len(stage_steps) + 1 == len(prep_times_list)
+        if plot_times_list is not None:
+            assert len(stage_steps) + 1 == len(plot_times_list)
+        if repetitions_list is not None:
+            assert len(stage_steps) + 1 == len(repetitions_list)
         assert len(stage_steps) + 1 == len(dot_size_list)
 
     use_line_attr = {
         "color": "r",
         "linestyle": "--",
-        "linewidth": 0.5,
+        "linewidth": 1,
         "alpha": 0.5,
         "label": "line",
     }
@@ -176,6 +225,8 @@ def graph_bifurcation(
         df = pd.read_pickle(read_from_file)
 
     r_vals = df.columns.tolist()
+    r_low = min(r_vals)
+    r_high = max(r_vals)
     cur_stage = -1
     for r in r_vals:
         # variable line size as for r <3.5 there are very few paths
@@ -214,52 +265,179 @@ def graph_bifurcation(
             alpha=use_line_attr["alpha"],
             label=use_line_attr["label"],
         )
-    ax.legend()
+        # only the line needs the legend
+        ax.legend(fontsize=18, loc="upper left")
 
-    ax.set_xlabel("$\lambda$", fontsize=15)
-    ax.set_ylabel("x", fontsize=15)
+    ax.set_xlabel(r"$\lambda$", fontsize=18)
+
+    if not no_vertical_label:
+        ax.set_ylabel("$x$", fontsize=18)
 
     ax.set_xlim(r_low, r_high)
-    # ax.tight_layout()
-    # plt.show()
-    # plt.axis('off')
-    # plt.gca().set_position([0, 0, 1, 1])
+    ax.tick_params(axis="both", which="major", labelsize=18)
 
     return ax
 
 
+###############################
+# START OF GRAPHING
+###############################
+
+#######
+# normal sin(x) bifurcation
+#######
 def sin_bi(la, x):
     return la * np.sin(2 * np.pi * x)
 
 
-cal_bifurcation_data(
-    sin_bi,
-    save_to_file="./sin_bifurcation_data_whole.pkl",
-    r_low=0,
-    r_high=1,
-    n_of_r=3000,
-    finer_tune=True,
-    stage_steps=[0.2, 0.4],
-    prep_times_list=[80, 80, 100],
-    plot_times_list=[100, 50, 150],
-    repetitions_list=[1, 4, 7],
-)
 
+sin_whole = {
+    "func": sin_bi,
+    "file_name": "sin_bifurcation_whole",
+    "r_low": 0,
+    "r_high": 1,
+    "n_of_r": 1500,
+    "prep_times": None,
+    "plot_times": None,
+    "random_x_0": True,
+    "x_low_bound": 0,
+    "x_high_bound": 1,
+    "repetitions": None,
+    "alpha": None,
+    "dot_size": None,
+    "finer_tune": True,
+    "stage_steps": [0.4],
+    "prep_times_list": [200, 100],
+    "plot_times_list": [15, 150],
+    "repetitions_list": [4, 7],
+    "alpha_list": [0.7, 0.4],
+    "dot_size_list": [0.8, 0.07],
+    "graph_line": lambda x: 0.25,
+    "line_attr": {"label": "$x = 0.25$"},
+}
 
-fig, ax = plt.subplots(1, 1, figsize=(10, 10))
+sin_details = {
+    "func": sin_bi,
+    "r_low": 0.3,
+    "r_high": 0.47,
+    "n_of_r": 1500,
+    "prep_times": None,
+    "plot_times": None,
+    "random_x_0": True,
+    "x_low_bound": 0,
+    "x_high_bound": 1,
+    "repetitions": None,
+    "alpha": None,
+    "dot_size": None,
+    "finer_tune": True,
+    "stage_steps": [0.4],
+    "prep_times_list": [300, 100],
+    "plot_times_list": [10, 150],
+    "repetitions_list": [4, 7],
+    "file_name": "sin_bifurcation_03-047",
+    "alpha_list": [0.6, 0.4],
+    "dot_size_list": [0.6, 0.07],
+    "graph_line": lambda x: 0.25,
+    "line_attr": {"label": "$x = 0.25$"},
+    "no_vertical_label": True,
+}
+
+# cal_bifurcation_data(
+#     config=sin_02_05,
+# )
+#
+# cal_bifurcation_data(
+#     config=sin_whole,
+# )
+#
+fig, ax = plt.subplots(1, 2, figsize=(14, 7))
+
 graph_bifurcation(
-    ax,
-    read_from_file="./sin_bifurcation_data_whole.pkl",
-    r_low=0,
-    r_high=1,
-    n_of_r=100,
-    graph_line=lambda x: 0.25,
-    line_attr={"label": "$y = 0.25$"},
-    plot_name="sin_bifurcation.png",
-    finer_tune=True,
-    stage_steps=[0.2, 0.4],
-    alpha_list=[1, 0.6, 0.5],
-    dot_size_list=[0.3, 0.12, 0.1],
+    ax[0],
+    config=sin_whole,
 )
+graph_bifurcation(
+    ax[1],
+    config=sin_details,
+)
+plt.tight_layout()
 
-plt.savefig("sin_bifurcation.png")
+plt.savefig("sin_bifurcation_combined.png")
+
+
+def sin_c(c, x):
+    return np.sin(2 * np.pi * x) + c
+
+
+sin_c_whole_config = {
+    "func": sin_c,
+    "file_name": "sin_c_bifurcation_whole",
+    "r_low": -1,
+    "r_high": 1,
+    "n_of_r": 1500,
+    "dot_size": None,
+    "random_x_0": True,
+    "x_low_bound": -1,
+    "x_high_bound": 1,
+    "finer_tune": True,
+    "stage_steps": [0.4],
+    "prep_times_list": [100, 100],
+    "plot_times_list": [150, 150],
+    "repetitions_list": [7, 7],
+    "alpha_list": [0.3, 0.4],
+    "dot_size_list": [0.07, 0.07],
+    "graph_line": lambda x: 0.25,
+    "line_attr": {"label": "$x = 0.25$"},
+    "prep_times": None,
+    "plot_times": None,
+    "repetitions": None,
+    "alpha": None,
+}
+
+sin_c_detail_config = {
+    "func": sin_c,
+    "file_name": "sin_c_bifurcation_detail",
+    "r_low": 0.25,
+    "r_high": 0.35,
+    "n_of_r": 2500,
+    "dot_size": None,
+    "random_x_0": True,
+    "x_low_bound": -1,
+    "x_high_bound": 1,
+    "finer_tune": True,
+    "stage_steps": [0.3],
+    "prep_times_list": [250, 100],
+    "plot_times_list": [20, 150],
+    "repetitions_list": [4, 10],
+    "alpha_list": [0.8, 0.6],
+    "dot_size_list": [0.80, 0.02],
+    "graph_line": lambda x: 1.25,
+    "line_attr": {"label": "$x = 1.25$"},
+    "prep_times": None,
+    "plot_times": None,
+    "repetitions": None,
+    "alpha": None,
+    "no_vertical_label": True,
+}
+
+# cal_bifurcation_data(
+#     config=sin_c_whole_config,
+# )
+
+# cal_bifurcation_data(
+#     config=sin_c_detail_config,
+# )
+
+# fig, ax = plt.subplots(1, 2, figsize=(14, 7))
+#
+# graph_bifurcation(
+#     ax[0],
+#     config=sin_c_whole_config,
+# )
+# graph_bifurcation(
+#     ax[1],
+#     config=sin_c_detail_config,
+# )
+# plt.tight_layout()
+#
+# plt.savefig("sin_c_try.png")
