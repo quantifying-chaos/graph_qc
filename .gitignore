@@ -46,3 +46,5 @@ profile.json
 .idea
 .vscode
 
+
+*.pkl

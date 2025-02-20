@@ -1,4 +1,5 @@
 import numpy as np
+import time
 
 
 def logistic(la, x):
@@ -63,3 +64,46 @@ def iterate_and_record_all_x_0(
             res.append(val)
 
     return res
+
+
+def get_stage(list_r, val):
+    """
+    list_r: increasing list of r
+    r: shall be smaller than or equal to the largest element in list_r
+
+    return:
+        an index of list_r such that list_r[index] <= val < list_r[index+1]
+
+    list_r = [1,2,40]
+    r = 0.1 -> return 0
+    r = 1.1 -> return 1
+    r= 2.1 -> return 2
+    r = 40.1 -> return 3
+    """
+    for i in range(len(list_r)):
+        if list_r[i] > val:
+            return i
+    return len(list_r)
+
+
+def timeit(func):
+    """Decorator to time a function and print the execution time."""
+
+    def wrapper(*args, **kwargs):
+        start_time = time.perf_counter()  # Start the timer
+        result = func(*args, **kwargs)  # Run the function
+        end_time = time.perf_counter()  # End the timer
+        elapsed_time = end_time - start_time  # Calculate elapsed time
+
+        GREEN = "\033[92m"
+        RED = "\033[91m"
+        BOLD = "\033[1m"
+        RESET = "\033[0m"
+
+        print(
+            f"Function {GREEN}{func.__name__}{RESET} took {
+              BOLD}{RED}{elapsed_time:.6f}{RESET} seconds"
+        )
+        return result  # Return the original function's result
+
+    return wrapper
