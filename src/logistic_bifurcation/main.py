@@ -4,7 +4,7 @@ from matplotlib.lines import Line2D
 
 
 def logistic(x, r):
-    return r * 4 * x*(1-x)
+    return r * 4 * x * (1 - x)
 
 
 def iterate_r(func, x_0, r, prep_times, plot_times):
@@ -49,14 +49,14 @@ plot_times = 2000  # Number of iterations to plot
 # Start of plotting
 
 fig, ax = plt.subplots()
-plt.grid(color='gray', linestyle=':', linewidth=0.5)
+plt.grid(color="gray", linestyle=":", linewidth=0.5)
 
 r_vals = np.linspace(r_low, r_high, n_of_r)
 
 for r in r_vals:
     # variable line size as for r <3.5 there are very few paths
     l_size = 0.05
-    if r < 3.5/4:  # before 3.5 the system is rather stable
+    if r < 3.5 / 4:  # before 3.5 the system is rather stable
         x = iterate_r(logistic, x_0, r, prep_times, 100)
         l_size = 0.1
     else:
@@ -65,14 +65,28 @@ for r in r_vals:
 
     # plt.plot([r]*len(x), x, ',b')
     r_dummy = np.linspace(r, r, len(x))
-    ax.scatter(r_dummy, x, c='tab:blue', s=l_size,
-               alpha=0.5, edgecolors='none', facecolors='tab:blue',
-               marker='o')
+    ax.scatter(
+        r_dummy,
+        x,
+        c="tab:blue",
+        s=l_size,
+        alpha=0.5,
+        edgecolors="none",
+        facecolors="tab:blue",
+        marker="o",
+    )
 
 # plot a line a y = 0.5
-ax.plot([r_low, r_high], [0.5, 0.5], color='r',
-        linestyle='--', linewidth=0.8, alpha=0.5, label='x=0.5')
-ax.legend(loc='upper left', fontsize=10)
+ax.plot(
+    [r_low, r_high],
+    [0.5, 0.5],
+    color="r",
+    linestyle="--",
+    linewidth=0.8,
+    alpha=0.5,
+    label="x=0.5",
+)
+ax.legend(loc="upper left", fontsize=10)
 
 # Custom legend
 # legend_elements = [
@@ -84,8 +98,8 @@ ax.legend(loc='upper left', fontsize=10)
 
 # ax.legend(handles=legend_elements, loc='upper left', fontsize=10)
 
-plt.xlabel('$\lambda$', fontsize=15)
-plt.ylabel('x', fontsize=15)
+plt.xlabel("$\lambda$", fontsize=15)
+plt.ylabel("x", fontsize=15)
 
 plt.xlim(r_low, r_high)
 plt.tight_layout()

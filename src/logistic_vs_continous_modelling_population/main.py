@@ -32,28 +32,28 @@ fig, ax = plt.subplots(1, 2, figsize=(14, 7))
 frame = fig.add_subplot(111, frameon=False)
 frame.set_xticks([])
 frame.set_yticks([])
-frame.set_ylabel('Population', fontsize=20, labelpad=40)
+frame.set_ylabel("Population", fontsize=20, labelpad=40)
 
 
 # mark each data point with a red circle and connecting with blue line
 # remove x, y labels
-ax[0].plot(y, '-bo', markersize=10)
+ax[0].plot(y, "-bo", markersize=10)
 ax[0].set_xticks([])
 ax[0].set_yticks([])
-ax[0].set_xlabel('Time', fontsize=18, labelpad=20)
-ax[0].set_title('Discrete Logistic Map', fontsize=20, y=-0.15)
+ax[0].set_xlabel("Time", fontsize=18, labelpad=20)
+ax[0].set_title("Discrete Logistic Map", fontsize=20, y=-0.15)
 
 # calculate the continuous logistic map
 x = np.linspace(-10, 10, 500)
 z = logistic_con(1, x)
 
-ax[1].plot(x, z, label='logistic_con', linewidth=2)
+ax[1].plot(x, z, label="logistic_con", linewidth=2)
 ax[1].set_xticks([])
 ax[1].set_yticks([])
-ax[1].set_xlabel('Time', fontsize=18, labelpad=20)
-ax[1].set_title('Continuous Logistic Map', fontsize=20, y=-0.15)
+ax[1].set_xlabel("Time", fontsize=18, labelpad=20)
+ax[1].set_title("Continuous Logistic Map", fontsize=20, y=-0.15)
 
 plt.tight_layout()
 # plt.show()
 
-plt.savefig('logistic_map.png')
+plt.savefig("logistic_map.png")

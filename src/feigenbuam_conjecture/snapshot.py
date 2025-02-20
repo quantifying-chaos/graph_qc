@@ -1,17 +1,18 @@
 import sympy as sp
+
 # import numpy as np
 # import matplotlib.pyplot as plt
 from sympy import symbols, Poly, simplify, collect, Eq
 
 sp.init_printing()
 
-a = symbols('a', positive=True)
-x = symbols('x')
+a = symbols("a", positive=True)
+x = symbols("x")
 
 n = 2
-b = symbols(f'b1:{n+1}')
+b = symbols(f"b1:{n+1}")
 
-p_x = 1 + sum(b[i] * x**(2*i+2) for i in range(n))
+p_x = 1 + sum(b[i] * x ** (2 * i + 2) for i in range(n))
 
 # print("p(x) =")
 # display(p_x)
@@ -30,8 +31,8 @@ for exp in sorted(coeff_dict.keys()):
 
 
 eqs = [Eq(coeff_dict[(0,)], 1)]
-for i in range(1, n+1):
-    eqs.append(Eq(coeff_dict[(2*i,)], b[i-1]))
+for i in range(1, n + 1):
+    eqs.append(Eq(coeff_dict[(2 * i,)], b[i - 1]))
 
 # display(eqs)
 # solve for coefficients
