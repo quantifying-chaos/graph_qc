@@ -27,7 +27,7 @@ x = symbols('x')
 
 # n is number of b_i
 # there is always 1 alpha, denoted as alpha, and n b_i
-n = 6
+n = 6  # took 3 minutes to run for n = 6 on Ryzen 7945HX
 b = symbols(f'b1:{n+1}') 
 
 p_x = 1 + sum(b[i] * x**(2*i+2) for i in range(n))
