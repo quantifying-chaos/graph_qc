@@ -6,6 +6,16 @@ def logistic(la, x):
     return 4 * la * x * (1 - x)
 
 
+def tent(la, x):
+    if x < 0:
+        x = -x
+    decimals = 2*x - int(2*x)
+    if int(2 * x) % 2 == 0:
+        return la * decimals
+    else:
+        return la * (1 - decimals)
+
+
 def iterate(fn, parameter, input, times):
     """
     fn shall be a function of two inputs:
@@ -52,13 +62,22 @@ def iterate_and_record_all_x_0(
             val = np.random.uniform(0, 1)
 
         for _ in range(prep_times):
-            val = func(r, val)
+            try:
+                val = func(r, val)
+            except (ZeroDivisionError, ValueError):
+                print("Error in func")
+                print(f"r = {r}, val = {val}")
+
             if abs(val) > 1e4:
                 return []
 
         # ignore x_500, recording values from x_501
         for _ in range(plot_times):
-            val = func(r, val)
+            try:
+                val = func(r, val)
+            except (ZeroDivisionError, ValueError):
+                print("Error in func")
+                print(f"r = {r}, val = {val}")
             if abs(val) > 1e4:
                 return []
             res.append(val)
@@ -102,7 +121,7 @@ def timeit(func):
 
         print(
             f"Function {GREEN}{func.__name__}{RESET} took {
-              BOLD}{RED}{elapsed_time:.6f}{RESET} seconds"
+                BOLD}{RED}{elapsed_time:.6f}{RESET} seconds"
         )
         return result  # Return the original function's result
 

@@ -48,3 +48,7 @@ profile.json
 
 
 *.pkl
+
+# c++ executable
+*.out
+*.o
