@@ -6,7 +6,7 @@ CFLAGS = -Wall -Wextra -Wpedantic -Wshadow -Wformat=2 -Wconversion \
          -Wnull-dereference -Wsign-conversion -std=c++17
 
 # Linker flags
-LDFLAGS = -lgmp
+LDFLAGS = -lgmp -lgmpxx
 
 # Target executable name
 TARGET = main.out
