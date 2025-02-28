@@ -9,6 +9,22 @@
 #include <stdexcept>
 #include <vector>
 
+// 4096 bit takes 3.83 secs for 
+// 512 takes 3.12 secs
+#define PRECISION 4096
+
+using namespace std;
+
+template <typename T>
+
+void display(vector<T>& dis)
+{
+    for (auto i : dis) {
+        cout << i << endl;
+    }
+	cout<<"length: "<<dis.size()<<endl;
+}
+
 mpf_class random_mpz(long low, long high)
 {
     if (high <= low) {
@@ -30,9 +46,9 @@ void logistic(mpf_class& res, mpf_class lambda, mpf_class x)
     res = 4 * lambda * x * (1 - x);
 }
 
-void plus_n(mpf_class& res, mpf_class lambda, mpf_class x)
+void logistic_skewed(mpf_class& res, mpf_class lambda, mpf_class x)
 {
-    res = x + lambda;
+    res = lambda * x * (1 - x) * (1 - x);
 }
 
 // Iterate the functions n times, with input x and parameter lambda,
@@ -115,29 +131,81 @@ void cal_feigenbaum(
     mpf_class (*x_bar)(mpf_class),
     std::vector<mpf_class> A_i)
 {
-    std::vector<mpf_class> delta_cal;
+    // calculating alphas
+    std::vector<mpf_class> alpha_cal;
     for (int i = 0; i < A_i.size() - 2; i++) {
-        delta_cal.push_back((A_i[i + 1] - A_i[i]) / (A_i[i + 2] - A_i[i + 1]));
+        alpha_cal.push_back((A_i[i + 1] - A_i[i]) / (A_i[i + 2] - A_i[i + 1]));
     }
 
-    for (int i = 0; i < delta_cal.size(); i++) {
-        std::cout << i + 1 << ": " << delta_cal[i] << std::endl;
-    }
-
+    // deltas
     std::vector<mpf_class> d_i;
     for (int i = 1; i < A_i.size(); i++) {
-        mpf_class local_max = x_bar(A_i[i]);
+        mpf_class local_max(x_bar(A_i[i]), PRECISION);
         mpf_class tmp;
         iterate(tmp, map, std::pow(2, i - 1), A_i[i], local_max);
         d_i.push_back(abs(local_max - tmp));
     }
 
-    std::cout << "delta" << std::endl;
+    cout << "di" << endl;
+    display(d_i);
+    cout << "alpha" << endl;
+    display(alpha_cal);
+
+	std::vector<mpf_class> delta_cal;
     for (int i = 0; i < d_i.size() - 1; i++) {
-        std::cout << d_i[i] / d_i[i + 1] << std::endl;
+        delta_cal.push_back( d_i[i] / d_i[i + 1]);
     }
+    std::cout << "delta" << std::endl;
+	display(delta_cal);
 }
 
+mpf_class one_third(mpf_class)
+{
+    return mpq_class(1, 3);
+}
+
+void cal_logistic_skewed()
+{
+    mpz_class counter = 0;
+    const mpf_class end = 6;
+    const mpf_class alpha = 2.503;
+    const mpf_class delta = 4.669;
+
+    mpf_class lambda_plus = 2;
+    mpf_class increment = 0.001;
+    // start of lambda
+    mpf_class lambda(2.8, 128);
+    std::vector<mpf_class> A_i = { 2.25 };
+
+    unsigned int cycle_p = 1;
+    mpf_class threshold = 0.0010;
+
+    cout << "lambda:" << endl;
+    while ((lambda < end) && (A_i.size() < 14)) {
+        if (is_super_stable(
+                logistic_skewed,
+                one_third,
+                lambda,
+                cycle_p,
+                threshold,
+                1)) {
+
+            lambda = poke_lambda(logistic_skewed, point5, lambda, cycle_p, increment / 200, 100);
+            std::cout << lambda << std::endl;
+            A_i.push_back(lambda);
+            increment /= delta;
+            lambda_plus /= (delta * 1.1);
+            lambda += lambda_plus;
+            threshold /= (alpha);
+            cycle_p += 1;
+        }
+        lambda += increment;
+        counter += 1;
+    }
+    std::cout << counter << " times iterated!" << std::endl;
+
+    cal_feigenbaum(logistic_skewed, one_third, A_i);
+}
 void cal_logistic()
 {
     mpz_class counter = 0;
@@ -147,7 +215,7 @@ void cal_logistic()
 
     mpf_class lambda_plus = 0.28;
     mpf_class increment = 0.001;
-    mpf_class lambda(0.7, 128);
+    mpf_class lambda(0.7, PRECISION);
     std::vector<mpf_class> A_i = { 0.5 };
 
     unsigned int cycle_p = 1;
@@ -162,8 +230,7 @@ void cal_logistic()
                 threshold,
                 1)) {
 
-            lambda = poke_lambda(logistic, point5, lambda, cycle_p, increment/200, 100);
-            std::cout << "lambda found at: " << lambda << std::endl;
+            lambda = poke_lambda(logistic, point5, lambda, cycle_p, increment / 200, 100);
             A_i.push_back(lambda);
             increment /= delta;
             lambda_plus /= delta;
@@ -176,13 +243,16 @@ void cal_logistic()
     }
     std::cout << counter << " times iterated!" << std::endl;
 
+	cout<<"lambda"<<endl;
+	display(A_i);
+
     cal_feigenbaum(logistic, [](mpf_class x) -> mpf_class { return 0.5; }, A_i);
 }
 
 int main()
 {
-    std::cout << std::fixed << std::setprecision(10);
+    std::cout << std::fixed << std::setprecision(64);
     cal_logistic();
-
+    // cal_logistic_skewed();
     return 0;
 }

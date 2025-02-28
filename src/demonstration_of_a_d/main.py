@@ -52,7 +52,7 @@ r_low = 0
 r_high = 0.89
 
 upper = 0.892518
-n_of_r = 2500  # Number of r values to try
+n_of_r = 1000  # Number of r values to try
 
 x_low = 0
 x_high = 1
@@ -60,9 +60,8 @@ x_high = 1
 # init x
 x_0 = 0.5
 
-prep_times = 600  # Number of iterations to ignore
+prep_times = 800  # Number of iterations to ignore
 plot_times = 100  # Number of iterations to plot
-alpha_tmp = 0.7
 
 # Start of plotting
 
@@ -83,8 +82,8 @@ for r in exp_in_r:
         r_dummy,
         x,
         c="tab:blue",
-        s=0.3,
-        alpha=0.8,
+        s=0.8,
+        alpha=0.8,  # do not change
         edgecolors="none",
         facecolors="tab:blue",
         marker="o",
@@ -110,11 +109,29 @@ for i in range(1, len(A_List)):
     closest_stable_pos.append(x_0)
 
 for id, ele in enumerate(closest_stable_pos):
-    plt.plot([A_List[id+1], A_List[id + 1]], [0.5, ele], 'm:')
+    plt.plot([A_List[id+1], A_List[id + 1]], [0.5, ele], 'm-.', linewidth=2.5)
     plt.text(A_List[id+1] + 0.1, (ele + 0.5)/2, f"$d_{id+1}$",
              horizontalalignment='left',
              verticalalignment='center',
              fontsize=18,)
+
+plt.annotate(f"$L_{{A_{1}}}(0.5)$", (A_List[1], closest_stable_pos[0]),
+             xytext=(A_List[1] - 1.4, closest_stable_pos[0]),
+             arrowprops=dict(
+    facecolor='red', shrink=0.05, headwidth=5, width=1),
+    fontsize=15)
+
+plt.annotate(f"$L^2_{{A_{2}}}(0.5)$", (A_List[2], closest_stable_pos[1]),
+             xytext=(A_List[2] - 1.4, closest_stable_pos[1]-0.1),
+             arrowprops=dict(
+    facecolor='red', shrink=0.05, headwidth=5, width=1),
+    fontsize=15)
+
+plt.annotate(f"$L^4_{{A_{3}}}(0.5)$", (A_List[3], closest_stable_pos[2]),
+             xytext=(A_List[3] - 1.4, closest_stable_pos[2]+0.07),
+             arrowprops=dict(
+    facecolor='red', shrink=0.05, headwidth=5, width=1),
+    fontsize=15)
 
 # plot a line a y = 0.5
 ax.plot(
@@ -128,6 +145,7 @@ ax.plot(
 )
 ax.legend(loc="upper left", fontsize=10)
 
+# plt.xlabel(r"$-\log(A_{\infty}-\lambda)$", fontsize=18)
 plt.xlabel(r"$\lambda$", fontsize=18)
 plt.ylabel("x", fontsize=18)
 
@@ -139,4 +157,4 @@ plt.tight_layout()
 
 # dpi = 2000 -> 28 MB image
 # dpi = 1000 -> 7 MB image
-plt.savefig("demonstration of feigenbuam constants", dpi=200)
+plt.savefig("demonstration of feigenbaum constants", dpi=200)

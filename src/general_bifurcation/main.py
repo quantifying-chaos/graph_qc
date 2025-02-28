@@ -905,6 +905,26 @@ def xxtimes_one_minus_x(c, x):
     return c * x * (1 - x) * (1 - x)
 
 
+xxtimes_one_minus_x_config_quick_try = {
+    "func": xxtimes_one_minus_x,
+    "file_name": "xx_one_minus_x_quick_try",
+    "r_low": -3,
+    "r_high": 10,
+    "n_of_r": 500,
+    "random_x_0": True,
+    "x_low_bound": -1,
+    "x_high_bound": 1,
+    "finer_tune": True,
+    "stage_steps": [5],
+    "prep_times_list": [100, 100],
+    "plot_times_list": [300, 300],
+    "repetitions_list": [4, 4],
+    "alpha_list": [1, 1],
+    "dot_size_list": [0.12, 0.12],
+    "graph_line": lambda x: 0.333,
+    "line_attr": {"label": r"$x = \frac{1}{3}$"},
+}
+
 xxtimes_one_minus_x_config = {
     "func": xxtimes_one_minus_x,
     "file_name": "xx_one_minus_x",
@@ -945,25 +965,28 @@ xxtimes_one_minus_x_zoom_config = {
     "line_attr": {"label": r"$x = \frac{1}{3}$"},
 }
 
+cal_bifurcation_data(
+    config=xxtimes_one_minus_x_config_quick_try,
+)
 # cal_bifurcation_data(
 #     config=xxtimes_one_minus_x_config,
 # )
 # cal_bifurcation_data(
 #     config=xxtimes_one_minus_x_zoom_config,
 # )
-#
-# fig, ax = plt.subplots(1, 2, figsize=(14, 7))
-# graph_bifurcation(
-#     ax[0],
-#     config=xxtimes_one_minus_x_config,
-# )
+
+fig, ax = plt.subplots(1, 2, figsize=(14, 7))
+graph_bifurcation(
+    ax[0],
+    config=xxtimes_one_minus_x_config_quick_try,
+)
 # graph_bifurcation(
 #     ax[1],
 #     config=xxtimes_one_minus_x_zoom_config,
 # )
-#
-# plt.tight_layout()
-# # plt.show()
+
+plt.tight_layout()
+plt.show()
 # plt.savefig("xxtimes_one_minus_x.png")
 
 
@@ -1148,52 +1171,52 @@ xlog_zoom_config = {
 
 
 # plot l_exp, tent, c_arctan, arctan_c together
-fig, ax = plt.subplots(4, 2, figsize=(14, 20))
-
-graph_bifurcation(
-    ax[0][0],
-    config=l_exp_config,
-)
-ax[0][0].set_title(r"$\lambda e^x$", fontsize=22)
-graph_bifurcation(
-    ax[0][1],
-    config=l_exp_config_zoomed_in,
-)
-ax[0][1].set_title(r"$\lambda e^x$", fontsize=22)
-
-graph_bifurcation(
-    ax[1][0],
-    config=tent_config,
-)
-ax[1][0].set_title(r"Tent Map", fontsize=22)
-graph_bifurcation(
-    ax[1][1],
-    config=tent_zoom_config,
-)
-ax[1][1].set_title(r"Tent Map", fontsize=22)
-
-graph_bifurcation(
-    ax[2][0],
-    config=c_arctan_config,
-)
-ax[2][0].set_title(r"$\lambda \arctan(x)$", fontsize=22)
-graph_bifurcation(
-    ax[2][1],
-    config=c_arctan_zoom_config,
-)
-ax[2][1].set_title(r"$\lambda \arctan(x)$", fontsize=22)
-
-graph_bifurcation(
-    ax[3][0],
-    config=arctan_c_config,
-)
-ax[3][0].set_title(r"$\arctan(\lambda x)$", fontsize=22)
-graph_bifurcation(
-    ax[3][1],
-    config=arctan_c_zoom_config,
-)
-ax[3][1].set_title(r"$\arctan(\lambda x)$", fontsize=22)
-
-plt.tight_layout()
-# plt.show()
-plt.savefig("combined_no_bifurcations.png")
+# fig, ax = plt.subplots(4, 2, figsize=(14, 20))
+#
+# graph_bifurcation(
+#     ax[0][0],
+#     config=l_exp_config,
+# )
+# ax[0][0].set_title(r"$\lambda e^x$", fontsize=22)
+# graph_bifurcation(
+#     ax[0][1],
+#     config=l_exp_config_zoomed_in,
+# )
+# ax[0][1].set_title(r"$\lambda e^x$", fontsize=22)
+#
+# graph_bifurcation(
+#     ax[1][0],
+#     config=tent_config,
+# )
+# ax[1][0].set_title(r"Tent Map", fontsize=22)
+# graph_bifurcation(
+#     ax[1][1],
+#     config=tent_zoom_config,
+# )
+# ax[1][1].set_title(r"Tent Map", fontsize=22)
+#
+# graph_bifurcation(
+#     ax[2][0],
+#     config=c_arctan_config,
+# )
+# ax[2][0].set_title(r"$\lambda \arctan(x)$", fontsize=22)
+# graph_bifurcation(
+#     ax[2][1],
+#     config=c_arctan_zoom_config,
+# )
+# ax[2][1].set_title(r"$\lambda \arctan(x)$", fontsize=22)
+#
+# graph_bifurcation(
+#     ax[3][0],
+#     config=arctan_c_config,
+# )
+# ax[3][0].set_title(r"$\arctan(\lambda x)$", fontsize=22)
+# graph_bifurcation(
+#     ax[3][1],
+#     config=arctan_c_zoom_config,
+# )
+# ax[3][1].set_title(r"$\arctan(\lambda x)$", fontsize=22)
+#
+# plt.tight_layout()
+# # plt.show()
+# plt.savefig("combined_no_bifurcations.png")
