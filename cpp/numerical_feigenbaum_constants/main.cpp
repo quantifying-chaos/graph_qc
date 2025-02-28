@@ -9,7 +9,7 @@
 #include <stdexcept>
 #include <vector>
 
-// 4096 bit takes 3.83 secs for 
+// 4096 bit takes 3.83 secs for
 // 512 takes 3.12 secs
 #define PRECISION 4096
 
@@ -22,7 +22,7 @@ void display(vector<T>& dis)
     for (auto i : dis) {
         cout << i << endl;
     }
-	cout<<"length: "<<dis.size()<<endl;
+    cout << "length: " << dis.size() << endl;
 }
 
 mpf_class random_mpz(long low, long high)
@@ -120,6 +120,23 @@ mpf_class poke_lambda(
     return lambda_list[std::distance(std::begin(diff), it)];
 }
 
+mpf_class poke_lambda_iterate(
+    void (*map)(mpf_class&, mpf_class, mpf_class),
+    mpf_class (*x_bar)(mpf_class),
+    mpf_class lambda, // poke the lambda value around this
+    unsigned int orbit_2_power, // at lambda, map has a stable 2^orbit_2_power orbit.
+                                // This means we iterate the map 2^{orbit_2_power} times
+    mpf_class poke_delta,
+    unsigned int poke_times,
+    unsigned int iter_n)
+{
+    for (unsigned int i = 0; i < iter_n; i++) {
+        lambda = poke_lambda(map, x_bar, lambda, orbit_2_power, poke_delta, poke_times);
+        poke_delta /= 2;
+    }
+    return lambda;
+}
+
 mpf_class point5(mpf_class)
 {
     return 0.5;
@@ -151,12 +168,12 @@ void cal_feigenbaum(
     cout << "alpha" << endl;
     display(alpha_cal);
 
-	std::vector<mpf_class> delta_cal;
+    std::vector<mpf_class> delta_cal;
     for (int i = 0; i < d_i.size() - 1; i++) {
-        delta_cal.push_back( d_i[i] / d_i[i + 1]);
+        delta_cal.push_back(d_i[i] / d_i[i + 1]);
     }
     std::cout << "delta" << std::endl;
-	display(delta_cal);
+    display(delta_cal);
 }
 
 mpf_class one_third(mpf_class)
@@ -230,11 +247,11 @@ void cal_logistic()
                 threshold,
                 1)) {
 
-            lambda = poke_lambda(logistic, point5, lambda, cycle_p, increment / 200, 100);
+            lambda = poke_lambda_iterate(logistic, point5, lambda, cycle_p, increment / 200, 100, 2);
             A_i.push_back(lambda);
             increment /= delta;
             lambda_plus /= delta;
-            lambda += lambda_plus;
+            lambda += (lambda_plus * 0.9);
             threshold /= (alpha * 0.9);
             cycle_p += 1;
         }
@@ -243,8 +260,8 @@ void cal_logistic()
     }
     std::cout << counter << " times iterated!" << std::endl;
 
-	cout<<"lambda"<<endl;
-	display(A_i);
+    cout << "lambda" << endl;
+    display(A_i);
 
     cal_feigenbaum(logistic, [](mpf_class x) -> mpf_class { return 0.5; }, A_i);
 }
