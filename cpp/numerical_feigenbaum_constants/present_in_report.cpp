@@ -37,14 +37,16 @@ mpf_class random_mpz(long low, long high)
     static gmp_randclass r1(gmp_randinit_default);
     static int init = 0;
     if (!init) {
-        r1.seed(std::chrono::system_clock::now().time_since_epoch().count());
+        r1.seed(
+            std::chrono::system_clock::now()
+                .time_since_epoch()
+                .count());
         init = 1;
     }
 
     return low + r1.get_f() * (high - low);
 }
 
-// ip stands for in place
 void logistic(mpf_class& res, mpf_class lambda, mpf_class x)
 {
     res = 4 * lambda * x * (1 - x);
@@ -57,12 +59,12 @@ void logistic_skewed(mpf_class& res, mpf_class lambda, mpf_class x)
 
 // Iterate the functions n times, with input x and parameter lambda,
 // and set the res to the result.
-// the input map must have signature like logistic_ip
+// the input map must have signature like logistic
 // that is,
 // void map(mpf_class &res, mpf_class lambda, mpf_class x)
 void iterate(
     mpf_class& res,
-    void (*map)(mpf_class&, mpf_class, mpf_class),
+	iter_map map,
     unsigned int n,
     mpf_class lambda,
     mpf_class x)
@@ -74,7 +76,7 @@ void iterate(
 }
 
 bool is_super_stable(
-    void (*map)(mpf_class&, mpf_class, mpf_class),
+	iter_map map,
     mpf_class (*x_bar)(mpf_class),
     mpf_class lambda,
     unsigned int orbit_2_power, // at lambda, map has a stable 2^orbit_2_power orbit.
@@ -93,7 +95,7 @@ bool is_super_stable(
 }
 
 mpf_class poke_lambda(
-    void (*map)(mpf_class&, mpf_class, mpf_class),
+    iter_map map,
     mpf_class (*x_bar)(mpf_class),
     mpf_class lambda,
     unsigned int orbit_2_power, // at lambda, map has a stable 2^orbit_2_power orbit.
@@ -125,7 +127,7 @@ mpf_class poke_lambda(
 }
 
 mpf_class poke_lambda_iterate(
-    void (*map)(mpf_class&, mpf_class, mpf_class),
+    iter_map map,
     mpf_class (*x_bar)(mpf_class),
     mpf_class lambda, // poke the lambda value around this
     unsigned int orbit_2_power, // at lambda, map has a stable 2^orbit_2_power orbit.
@@ -141,14 +143,9 @@ mpf_class poke_lambda_iterate(
     return lambda;
 }
 
-mpf_class point5(mpf_class)
-{
-    return 0.5;
-}
-
 // The first element in A_i must be A_0: the lambda at which the 1-orbit stable fixed point achieves superstability
 void cal_and_display_fei_constants(
-    void (*map)(mpf_class&, mpf_class, mpf_class),
+    iter_map map,
     mpf_class (*x_bar)(mpf_class),
     std::vector<mpf_class> A_i)
 {
@@ -206,7 +203,7 @@ void find_feigenbaum_numerically(
                 threshold,
                 1)) {
 
-            lambda_start = poke_lambda_iterate(map, point5, lambda_start, start_cycle, lambda_inc / 200, 100, 2);
+            lambda_start = poke_lambda_iterate(map, max_func, lambda_start, start_cycle, lambda_inc / 200, 100, 2);
             A_i.push_back(lambda_start);
             lambda_inc /= DELTA;
             lambda_jump /= DELTA;
@@ -238,7 +235,7 @@ int main()
         A_i,
         1,
         mpf_class(0.005, PRECISION),
-        10);
+        16);
 
     std::vector<mpf_class> A_i_skewed = { 2.25 };
     find_feigenbaum_numerically(
