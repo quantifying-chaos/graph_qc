@@ -1,5 +1,6 @@
 // compile with -lgmpxx -lgmp
 #include <algorithm>
+#include <bits/stdc++.h>
 #include <chrono>
 #include <cmath>
 #include <gmp.h>
@@ -9,14 +10,17 @@
 #include <stdexcept>
 #include <vector>
 
-// 4096 bit takes 3.83 secs for
-// 512 takes 3.12 secs
-#define PRECISION 4096
+#define PRECISION 4096 // in bits
 
 using namespace std;
 
-template <typename T>
+typedef void (*iter_map)(mpf_class&, mpf_class, mpf_class);
+typedef mpf_class (*mpf_func)(mpf_class);
 
+const mpf_class ALPHA = mpf_class(2.503, PRECISION);
+const mpf_class DELTA = mpf_class(4.669, PRECISION);
+
+template <typename T>
 void display(vector<T>& dis)
 {
     for (auto i : dis) {
@@ -143,7 +147,7 @@ mpf_class point5(mpf_class)
 }
 
 // The first element in A_i must be A_0: the lambda at which the 1-orbit stable fixed point achieves superstability
-void cal_feigenbaum(
+void cal_and_display_fei_constants(
     void (*map)(mpf_class&, mpf_class, mpf_class),
     mpf_class (*x_bar)(mpf_class),
     std::vector<mpf_class> A_i)
@@ -181,95 +185,73 @@ mpf_class one_third(mpf_class)
     return mpq_class(1, 3);
 }
 
-void cal_logistic_skewed()
+void find_feigenbaum_numerically(
+    iter_map map,
+    mpf_func max_func,
+    mpf_class lambda_start,
+    mpf_class end,
+    mpf_class lambda_jump,
+    mpf_class lambda_inc,
+    vector<mpf_class> A_i,
+    unsigned int start_cycle,
+    mpf_class threshold,
+    unsigned int stop_at)
 {
-    mpz_class counter = 0;
-    const mpf_class end = 6;
-    const mpf_class alpha = 2.503;
-    const mpf_class delta = 4.669;
-
-    mpf_class lambda_plus = 2;
-    mpf_class increment = 0.001;
-    // start of lambda
-    mpf_class lambda(2.8, 128);
-    std::vector<mpf_class> A_i = { 2.25 };
-
-    unsigned int cycle_p = 1;
-    mpf_class threshold = 0.0010;
-
-    cout << "lambda:" << endl;
-    while ((lambda < end) && (A_i.size() < 14)) {
+    while ((lambda_start < end) && (A_i.size() < stop_at)) {
         if (is_super_stable(
-                logistic_skewed,
-                one_third,
-                lambda,
-                cycle_p,
+                map,
+                max_func,
+                lambda_start,
+                start_cycle,
                 threshold,
                 1)) {
 
-            lambda = poke_lambda(logistic_skewed, point5, lambda, cycle_p, increment / 200, 100);
-            std::cout << lambda << std::endl;
-            A_i.push_back(lambda);
-            increment /= delta;
-            lambda_plus /= (delta * 1.1);
-            lambda += lambda_plus;
-            threshold /= (alpha);
-            cycle_p += 1;
+            lambda_start = poke_lambda_iterate(map, point5, lambda_start, start_cycle, lambda_inc / 200, 100, 2);
+            A_i.push_back(lambda_start);
+            lambda_inc /= DELTA;
+            lambda_jump /= DELTA;
+            lambda_start += (lambda_jump * 0.9);
+            threshold /= (ALPHA * 0.9);
+            start_cycle += 1;
         }
-        lambda += increment;
-        counter += 1;
+        lambda_start += lambda_inc;
     }
-    std::cout << counter << " times iterated!" << std::endl;
-
-    cal_feigenbaum(logistic_skewed, one_third, A_i);
-}
-void cal_logistic()
-{
-    mpz_class counter = 0;
-    const mpf_class end = 1;
-    const mpf_class alpha = 2.503;
-    const mpf_class delta = 4.669;
-
-    mpf_class lambda_plus = 0.28;
-    mpf_class increment = 0.001;
-    mpf_class lambda(0.7, PRECISION);
-    std::vector<mpf_class> A_i = { 0.5 };
-
-    unsigned int cycle_p = 1;
-    mpf_class threshold = 0.005;
-
-    while ((lambda < end) && (A_i.size() < 16)) {
-        if (is_super_stable(
-                logistic,
-                [](mpf_class x) -> mpf_class { return 0.5; },
-                lambda,
-                cycle_p,
-                threshold,
-                1)) {
-
-            lambda = poke_lambda_iterate(logistic, point5, lambda, cycle_p, increment / 200, 100, 2);
-            A_i.push_back(lambda);
-            increment /= delta;
-            lambda_plus /= delta;
-            lambda += (lambda_plus * 0.9);
-            threshold /= (alpha * 0.9);
-            cycle_p += 1;
-        }
-        lambda += increment;
-        counter += 1;
-    }
-    std::cout << counter << " times iterated!" << std::endl;
 
     cout << "lambda" << endl;
     display(A_i);
 
-    cal_feigenbaum(logistic, [](mpf_class x) -> mpf_class { return 0.5; }, A_i);
+    cal_and_display_fei_constants(map, max_func, A_i);
 }
 
 int main()
 {
     std::cout << std::fixed << std::setprecision(64);
-    cal_logistic();
-    // cal_logistic_skewed();
+
+    std::vector<mpf_class> A_i = { 0.5 };
+    find_feigenbaum_numerically(
+        logistic,
+        [](mpf_class) -> mpf_class { return 0.5; },
+        mpf_class(0.7, PRECISION),
+        mpf_class(1, PRECISION),
+        mpf_class(0.28, PRECISION),
+        mpf_class(0.001, PRECISION),
+        A_i,
+        1,
+        mpf_class(0.005, PRECISION),
+        10);
+
+    std::vector<mpf_class> A_i_skewed = { 2.25 };
+    find_feigenbaum_numerically(
+        logistic_skewed,
+        one_third,
+        mpf_class(2.8, PRECISION),
+        mpf_class(6, PRECISION),
+        mpf_class(2.8, PRECISION),
+        mpf_class(0.001, PRECISION),
+        A_i_skewed,
+        1,
+        mpf_class(0.001, 128),
+        16);
+
     return 0;
 }
