@@ -41,6 +41,8 @@ for i in range(row):
         ax[t_row][t_col].legend(fontsize=24)
         # set ticks size
         ax[t_row][t_col].tick_params(axis="both", labelsize=14)
+        ax[t_row][t_col].set_xlabel("Time", fontsize=20)
+        ax[t_row][t_col].set_ylabel("Population", fontsize=20)
 
 frame = fig.add_subplot(111, frameon=False)
 frame.set_xticks([])

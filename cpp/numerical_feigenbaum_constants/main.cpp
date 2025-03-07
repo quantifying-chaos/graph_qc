@@ -228,17 +228,17 @@ int main()
     std::cout << std::fixed << std::setprecision(64);
 
     std::vector<mpf_class> A_i = { 0.5 };
-    find_feigenbaum_numerically(
-        logistic,
-        [](mpf_class) -> mpf_class { return 0.5; },
-        mpf_class(0.7, PRECISION),
-        mpf_class(1, PRECISION),
-        mpf_class(0.28, PRECISION),
-        mpf_class(0.001, PRECISION),
-        A_i,
-        1,
-        mpf_class(0.005, PRECISION),
-        10);
+    // find_feigenbaum_numerically(
+    //     logistic,
+    //     [](mpf_class) -> mpf_class { return 0.5; },
+    //     mpf_class(0.7, PRECISION),
+    //     mpf_class(1, PRECISION),
+    //     mpf_class(0.28, PRECISION),
+    //     mpf_class(0.001, PRECISION),
+    //     A_i,
+    //     1,
+    //     mpf_class(0.005, PRECISION),
+    //     10);
 
     std::vector<mpf_class> A_i_skewed = { 2.25 };
     find_feigenbaum_numerically(
