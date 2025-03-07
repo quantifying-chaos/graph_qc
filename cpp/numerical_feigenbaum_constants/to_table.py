@@ -138,6 +138,32 @@ length: 14
 
 
 def to_table(text):
+    """
+    Text shall be of the format
+    lambda
+    0.5000000000
+    0.8064950000
+    ...
+    length: 16
+    di
+    0.3064950000
+    0.1151528380
+    ...
+    length: 15
+    alpha
+    4.5358092997
+    4.6838460230
+    ...
+    length: 14
+    delta
+    2.6616365278
+    2.5423697165
+    ...
+    length: 14
+
+    Where the values calucated are the point of superstability, difference
+    in in the major arch, and the feigenbaum constants.
+    """
     li = [[], [], [], []]
     counter = 0
     is_digit = False
@@ -145,19 +171,23 @@ def to_table(text):
         if line == "":
             continue
         if line[0].isdigit():
-            li[counter].append(line)
+            li[counter].append(f"{line:.10}")
             is_digit = True
         else:
             if is_digit:
                 counter += 1
             is_digit = False
 
+    # there is no b_0
+    li[1].insert(0, " - ")
+    li[3].insert(0, " - ")
+
     buf = ""
     for i in range(len(li[0])):
         buf += str(i) + " " + "& "
         for j in range(4):
             if len(li[j]) > i:
-                buf += f"{li[j][i]:0.10}" + " "
+                buf += li[j][i] + " "
             else:
                 buf += " - "
             if j != 3:
