@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.lines import Line2D
+# from matplotlib.lines import Line2D
 
 
 def logistic(x, r):

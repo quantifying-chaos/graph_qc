@@ -720,6 +720,20 @@ logistic_config_zoom_3 = {
 #     config=logistic_config_zoom_3
 # )
 
+fig, ax = plt.subplots(1, 2, figsize=(14, 7))
+graph_bifurcation(
+    ax[0],
+    config=logistic_config,
+)
+
+graph_bifurcation(
+    ax[1],
+    config=logistic_config_zoom_1,
+)
+
+plt.tight_layout()
+plt.savefig("logistic_for_presentation.png")
+plt.show()
 # fig, ax = plt.subplots(2, 2, figsize=(14, 14))
 #
 # graph_bifurcation(
@@ -965,9 +979,9 @@ xxtimes_one_minus_x_zoom_config = {
     "line_attr": {"label": r"$x = \frac{1}{3}$"},
 }
 
-cal_bifurcation_data(
-    config=xxtimes_one_minus_x_config_quick_try,
-)
+# cal_bifurcation_data(
+#     config=xxtimes_one_minus_x_config_quick_try,
+# )
 # cal_bifurcation_data(
 #     config=xxtimes_one_minus_x_config,
 # )
@@ -975,18 +989,18 @@ cal_bifurcation_data(
 #     config=xxtimes_one_minus_x_zoom_config,
 # )
 
-fig, ax = plt.subplots(1, 2, figsize=(14, 7))
-graph_bifurcation(
-    ax[0],
-    config=xxtimes_one_minus_x_config_quick_try,
-)
+# fig, ax = plt.subplots(1, 2, figsize=(14, 7))
+# graph_bifurcation(
+#     ax[0],
+#     config=xxtimes_one_minus_x_config_quick_try,
+# )
 # graph_bifurcation(
 #     ax[1],
 #     config=xxtimes_one_minus_x_zoom_config,
 # )
 
-plt.tight_layout()
-plt.show()
+# plt.tight_layout()
+# plt.show()
 # plt.savefig("xxtimes_one_minus_x.png")
 
 
@@ -1030,12 +1044,12 @@ tent_zoom_config = {
     # "line_attr": {"label": r"$x = \frac{1}{3}$"},
 }
 #
-cal_bifurcation_data(
-    config=tent_config,
-)
-cal_bifurcation_data(
-    config=tent_zoom_config,
-)
+# cal_bifurcation_data(
+#     config=tent_config,
+# )
+# cal_bifurcation_data(
+#     config=tent_zoom_config,
+# )
 # #
 # fig, ax = plt.subplots(1, 2, figsize=(14, 7))
 # graph_bifurcation(
